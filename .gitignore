@@ -1,0 +1,33 @@
+# Секреты — никогда не коммитить
+.env
+
+# База данных
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Логи
+*.log
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
