@@ -7,8 +7,8 @@ bot.py — Telegram-рассылка через python-telegram-bot 20.x (async)
 from __future__ import annotations
 
 import asyncio
+import html
 import logging
-import time
 from datetime import date
 
 from telegram import Bot
@@ -38,10 +38,10 @@ _NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️
 def _fmt_tender(idx: int, t: dict) -> str:
     num = _NUMS[idx - 1] if idx <= len(_NUMS) else f"{idx}."
     source_host = "zakupki.gov.ru" if t.get("source") == "gos" else "sberbank-ast.ru"
-    url = t.get("url") or source_host
-    deadline = t.get("deadline") or "—"
-    customer = t.get("customer") or "—"
-    title = t.get("title") or "Без названия"
+    url = html.escape(t.get("url") or source_host)
+    deadline = html.escape(t.get("deadline") or "—")
+    customer = html.escape(t.get("customer") or "—")
+    title = html.escape(t.get("title") or "Без названия")
 
     return (
         f"{num} {title}\n"
