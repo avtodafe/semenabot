@@ -6,7 +6,7 @@ load_dotenv()
 BOT_TOKEN: str = os.environ["BOT_TOKEN"]
 CHANNEL_ID: str = os.environ["CHANNEL_ID"]
 DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///semenabot.db")
-MIN_PRICE: int = int(os.getenv("MIN_PRICE", "500000"))
+MIN_PRICE: int = int(os.getenv("MIN_PRICE", "100000"))
 
 # Keywords by group — OR logic within each group
 KEYWORD_GROUPS: dict[str, list[str]] = {

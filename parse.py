@@ -25,15 +25,18 @@ def main() -> int:
     from models import init_db, save_tenders
     from parser_gos import fetch_all_tenders as fetch_gos
     from parser_sber import fetch_all_tenders as fetch_sber
+    from parser_sites import fetch_all_tenders as fetch_sites
 
     logger.info("=== Parse run started ===")
     init_db()
 
     gos = fetch_gos()
     sber = fetch_sber()
-    all_tenders = gos + sber
+    sites = fetch_sites()
+    all_tenders = gos + sber + sites
     logger.info(
-        "Fetched total %d (GOS: %d | SBER: %d)", len(all_tenders), len(gos), len(sber)
+        "Fetched total %d (GOS: %d | SBER: %d | SITES: %d)",
+        len(all_tenders), len(gos), len(sber), len(sites),
     )
 
     unique = deduplicate(all_tenders)
