@@ -123,10 +123,25 @@ def _parse_entries(soup: BeautifulSoup) -> list[dict]:
             if price < MIN_PRICE:
                 continue
 
-            # Dates (publish_date, deadline)
-            date_els = block.select(".data-block__value")
-            publish_date = date_els[0].get_text(strip=True) if len(date_els) > 0 else ""
-            deadline = date_els[1].get_text(strip=True) if len(date_els) > 1 else ""
+            # Dates — find block labelled "Окончание подачи заявок"
+            publish_date = ""
+            deadline = ""
+            for data_block in block.select(".data-block"):
+                title_el = data_block.select_one(".data-block__title")
+                val_el = data_block.select_one(".data-block__value")
+                if not title_el or not val_el:
+                    continue
+                label = title_el.get_text(strip=True).lower()
+                val = val_el.get_text(strip=True)
+                if "размещен" in label:
+                    publish_date = val
+                elif "подач" in label or "окончани" in label:
+                    deadline = val
+            # Fallback: take first two .data-block__value if labels not found
+            if not publish_date and not deadline:
+                date_els = block.select(".data-block__value")
+                publish_date = date_els[0].get_text(strip=True) if len(date_els) > 0 else ""
+                deadline = date_els[1].get_text(strip=True) if len(date_els) > 1 else ""
 
             entries.append(
                 {
