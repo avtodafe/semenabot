@@ -34,10 +34,33 @@ def _fmt_price(price: float) -> str:
 
 _NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
+_SOURCE_HOST: dict[str, str] = {
+    "gos":        "zakupki.gov.ru",
+    "sber":       "sberbank-ast.ru",
+    "rts":        "rts-tender.ru",
+    "roseltorg":  "roseltorg.ru",
+    "b2b":        "b2b-center.ru",
+    "otc":        "otc.ru",
+    "fabrikant":  "fabrikant.ru",
+    "tektorg":    "tektorg.ru",
+    "etpgpb":     "etpgpb.ru",
+    "etpets":     "etp-ets.ru",
+    "etpmicex":   "etp-micex.ru",
+    "agzrt":      "agzrt.ru",
+    "lotonline":  "lot-online.ru",
+    "etpgoz":     "etpgoz.ru",
+    "zakupki360": "zakupki360.ru",
+    "bicotender": "bicotender.ru",
+    "rostender":  "rostender.info",
+    "kontur":     "zakupki.kontur.ru",
+    "trade":      "trade.su",
+}
+
 
 def _fmt_tender(idx: int, t: dict) -> str:
     num = _NUMS[idx - 1] if idx <= len(_NUMS) else f"{idx}."
-    source_host = "zakupki.gov.ru" if t.get("source") == "gos" else "sberbank-ast.ru"
+    source = t.get("source") or ""
+    source_host = _SOURCE_HOST.get(source, "zakupki.gov.ru")
     url = html.escape(t.get("url") or source_host)
     deadline = html.escape(t.get("deadline") or "—")
     customer = html.escape(t.get("customer") or "—")

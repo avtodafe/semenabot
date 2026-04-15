@@ -6,13 +6,15 @@ Cron:
     0 10 * * * /usr/bin/python3 /home/user/semenabot/send.py
 """
 import logging
+import os
 import sys
 
+_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send.log")
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
-        logging.FileHandler("send.log", encoding="utf-8"),
+        logging.FileHandler(_LOG, encoding="utf-8"),
         logging.StreamHandler(sys.stdout),
     ],
 )

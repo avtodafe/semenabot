@@ -5,7 +5,15 @@ load_dotenv()
 
 BOT_TOKEN: str = os.environ["BOT_TOKEN"]
 CHANNEL_ID: str = os.environ["CHANNEL_ID"]
-DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///semenabot.db")
+
+# Resolve relative sqlite paths to absolute (safe regardless of cwd)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_raw_db = os.getenv("DATABASE_URL", "sqlite:///semenabot.db")
+if _raw_db.startswith("sqlite:///") and not _raw_db.startswith("sqlite:////"):
+    _rel = _raw_db[len("sqlite:///"):]
+    if not os.path.isabs(_rel):
+        _raw_db = f"sqlite:///{os.path.join(_HERE, _rel)}"
+DATABASE_URL: str = _raw_db
 MIN_PRICE: int = int(os.getenv("MIN_PRICE", "100000"))
 
 # Keywords by group — OR logic within each group

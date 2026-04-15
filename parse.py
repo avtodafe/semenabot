@@ -6,13 +6,15 @@ Cron:
     0 8 * * * /usr/bin/python3 /home/user/semenabot/parse.py
 """
 import logging
+import os
 import sys
 
+_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "parse.log")
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
-        logging.FileHandler("parse.log", encoding="utf-8"),
+        logging.FileHandler(_LOG, encoding="utf-8"),
         logging.StreamHandler(sys.stdout),
     ],
 )
