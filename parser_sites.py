@@ -80,9 +80,13 @@ def _get(session: requests.Session, url: str, params: dict | None = None) -> Bea
         r = session.get(url, params=params, timeout=8)
         r.raise_for_status()
         return BeautifulSoup(r.text, "lxml")
+    except requests.exceptions.HTTPError as e:
+        # 503 / 403 — сайт блокирует, пробрасываем чтобы fetch_all мог пропустить сайт
+        logger.warning("GET %s — %s", url, e)
+        raise
     except Exception as e:
         logger.warning("GET %s — %s", url, e)
-        return None
+        raise
 
 
 def _tender(*, reg_num: str, title: str, customer: str = "", inn: str = "",
@@ -706,10 +710,17 @@ def fetch_all_tenders() -> list[dict]:
     with _make_session() as session:
         for site_name, fetcher in SITE_FETCHERS:
             site_count = 0
-            for kw in SEARCH_TERMS:
+            site_failed = False
+            for i, kw in enumerate(SEARCH_TERMS):
                 logger.info("%s: '%s'", site_name, kw)
                 try:
-                    for entry in fetcher(session, kw):
+                    entries = fetcher(session, kw)
+                    # Если первый запрос вернул None (сайт недоступен) — пропускаем сайт
+                    if entries is None and i == 0:
+                        logger.warning("%s: недоступен, пропускаем", site_name)
+                        site_failed = True
+                        break
+                    for entry in (entries or []):
                         rn = entry["reg_num"]
                         if rn not in seen:
                             seen.add(rn)
@@ -717,8 +728,13 @@ def fetch_all_tenders() -> list[dict]:
                             site_count += 1
                 except Exception as e:
                     logger.error("%s error '%s': %s", site_name, kw, e)
+                    if i == 0:
+                        logger.warning("%s: первый запрос упал, пропускаем сайт", site_name)
+                        site_failed = True
+                        break
                 time.sleep(REQUEST_PAUSE)
-            logger.info("%s: итого %d тендеров", site_name, site_count)
+            if not site_failed:
+                logger.info("%s: итого %d тендеров", site_name, site_count)
 
     logger.info("Все доп. площадки: %d уникальных тендеров", len(result))
     return result
