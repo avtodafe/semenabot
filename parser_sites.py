@@ -41,7 +41,7 @@ HEADERS = {
     "Accept-Language": "ru-RU,ru;q=0.9",
 }
 
-REQUEST_PAUSE = 2.0
+REQUEST_PAUSE = 0.5
 
 
 # ---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ def _make_session() -> requests.Session:
 
 def _get(session: requests.Session, url: str, params: dict | None = None) -> BeautifulSoup | None:
     try:
-        r = session.get(url, params=params, timeout=30)
+        r = session.get(url, params=params, timeout=8)
         r.raise_for_status()
         return BeautifulSoup(r.text, "lxml")
     except Exception as e:

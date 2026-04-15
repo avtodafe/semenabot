@@ -6,14 +6,25 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Parse and send via SSH
+      - name: Parse tenders
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 46.8.254.134
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 20m
           script: |
             cd /root/semenabot
             python3 parse.py
+      - name: Send to Telegram
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 46.8.254.134
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 5m
+          script: |
+            cd /root/semenabot
             python3 send.py
