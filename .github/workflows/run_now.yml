@@ -12,6 +12,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 46.8.254.134
+          port: 2244
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           command_timeout: 20m
@@ -22,6 +23,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 46.8.254.134
+          port: 2244
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           command_timeout: 5m
