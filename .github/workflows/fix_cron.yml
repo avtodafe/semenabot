@@ -1,0 +1,22 @@
+name: Fix cron
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fix cron via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 46.8.254.134
+          port: 2244
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            PYTHON=$(which python3)
+            echo "Python path: $PYTHON"
+            (crontab -l | grep -v semenabot; echo "0 8 * * * cd /root/semenabot && $PYTHON parse.py >> /root/semenabot/parse.log 2>&1"; echo "0 10 * * * cd /root/semenabot && $PYTHON send.py >> /root/semenabot/send.log 2>&1") | crontab -
+            echo "Cron updated:"
+            crontab -l | grep semenabot
