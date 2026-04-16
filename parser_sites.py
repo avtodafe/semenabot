@@ -80,13 +80,9 @@ def _get(session: requests.Session, url: str, params: dict | None = None) -> Bea
         r = session.get(url, params=params, timeout=8)
         r.raise_for_status()
         return BeautifulSoup(r.text, "lxml")
-    except requests.exceptions.HTTPError as e:
-        # 503 / 403 — сайт блокирует, пробрасываем чтобы fetch_all мог пропустить сайт
-        logger.warning("GET %s — %s", url, e)
-        raise
     except Exception as e:
         logger.warning("GET %s — %s", url, e)
-        raise
+        return None
 
 
 def _tender(*, reg_num: str, title: str, customer: str = "", inn: str = "",
@@ -119,12 +115,12 @@ def _id_from_url(href: str, prefix: str) -> str:
 # ---------------------------------------------------------------------------
 # РТС-тендер  rts-tender.ru
 # ---------------------------------------------------------------------------
-def _fetch_rts(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_rts(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.rts-tender.ru/tender/search", {
         "text": kw, "priceFrom": MIN_PRICE, "dateFrom": _yesterday_ru(),
     })
     if not soup:
-        return []
+        return None
     out = []
     for row in soup.select(".search-result__item, .tender-row, tr.search-item"):
         a = row.select_one("a.search-result__name, a.tender-name, td.subject a")
@@ -152,12 +148,12 @@ def _fetch_rts(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Росэлторг  roseltorg.ru
 # ---------------------------------------------------------------------------
-def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.roseltorg.ru/search/", {
         "query": kw, "minPrice": MIN_PRICE, "type": "tender",
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".search__item, .tender-item, .lot-item"):
         a = item.select_one("a.search__title, a.tender-title, h3 a")
@@ -185,12 +181,12 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # B2B-Center  b2b-center.ru
 # ---------------------------------------------------------------------------
-def _fetch_b2b(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_b2b(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.b2b-center.ru/market/search/", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".lot-list__item, .search-result, .trade-item"):
         a = item.select_one("a.lot-list__title, a.trade-title, .item-title a")
@@ -218,12 +214,12 @@ def _fetch_b2b(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # OTC.ru
 # ---------------------------------------------------------------------------
-def _fetch_otc(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_otc(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://otc.ru/tenders", {
         "search": kw, "price_from": MIN_PRICE, "date_from": _yesterday_iso(),
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-list__item, .tender-card, .search-result__item"):
         a = item.select_one("a.tender-name, a.tender-title, .tender-subject a")
@@ -251,12 +247,12 @@ def _fetch_otc(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Фабрикант  fabrikant.ru
 # ---------------------------------------------------------------------------
-def _fetch_fabrikant(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_fabrikant(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.fabrikant.ru/trades/search/", {
         "q": kw, "price_from": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".trade-item, .search-item, .lot-row"):
         a = item.select_one("a.trade-name, a.lot-name, .item-title a")
@@ -284,12 +280,12 @@ def _fetch_fabrikant(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # ТЭК-Торг  tektorg.ru
 # ---------------------------------------------------------------------------
-def _fetch_tektorg(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_tektorg(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.tektorg.ru/procedures", {
         "search": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".procedure-item, .tender-item, .lot-item"):
         a = item.select_one("a.procedure-name, a.tender-name, h3 a")
@@ -317,12 +313,12 @@ def _fetch_tektorg(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # ЭТП ГПБ  etpgpb.ru
 # ---------------------------------------------------------------------------
-def _fetch_etpgpb(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_etpgpb(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://etpgpb.ru/procedures/list", {
         "search": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".procedure-item, .tender-row, .search-item"):
         a = item.select_one("a.procedure-title, a.tender-name, .item-name a")
@@ -350,12 +346,12 @@ def _fetch_etpgpb(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # ЭТП ЕТС  etp-ets.ru
 # ---------------------------------------------------------------------------
-def _fetch_etpets(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_etpets(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.etp-ets.ru/tenders", {
         "search": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .lot-item, .search-result"):
         a = item.select_one("a.tender-name, a.lot-name, .subject a")
@@ -383,12 +379,12 @@ def _fetch_etpets(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # ЭТП ММВБ  etp-micex.ru
 # ---------------------------------------------------------------------------
-def _fetch_etpmicex(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_etpmicex(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.etp-micex.ru/tenders", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .lot-item"):
         a = item.select_one("a.tender-name, a.lot-name, h3 a")
@@ -416,12 +412,12 @@ def _fetch_etpmicex(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # АГЗРТ  agzrt.ru
 # ---------------------------------------------------------------------------
-def _fetch_agzrt(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_agzrt(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://agzrt.ru/tenders", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .lot-item, tr.tender"):
         a = item.select_one("a.tender-name, a.lot-name, td.name a")
@@ -449,12 +445,12 @@ def _fetch_agzrt(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Lot-online  lot-online.ru
 # ---------------------------------------------------------------------------
-def _fetch_lotonline(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_lotonline(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://lot-online.ru/auctions", {
         "search": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".auction-item, .lot-item, .tender-item"):
         a = item.select_one("a.auction-name, a.lot-name, a.tender-name, h3 a")
@@ -482,12 +478,12 @@ def _fetch_lotonline(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # ЭТП ГОЗ  etpgoz.ru
 # ---------------------------------------------------------------------------
-def _fetch_etpgoz(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_etpgoz(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://www.etpgoz.ru/tenders", {
         "search": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .lot-item"):
         a = item.select_one("a.tender-name, a.lot-name, h3 a")
@@ -515,12 +511,12 @@ def _fetch_etpgoz(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Закупки360  zakupki360.ru  (агрегатор)
 # ---------------------------------------------------------------------------
-def _fetch_zakupki360(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_zakupki360(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://zakupki360.ru/purchases", {
         "q": kw, "priceFrom": MIN_PRICE, "dateFrom": _yesterday_iso(),
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".purchase-item, .tender-item, .search-item"):
         a = item.select_one("a.purchase-title, a.tender-name, .item-title a")
@@ -548,12 +544,12 @@ def _fetch_zakupki360(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Bicotender  bicotender.ru  (агрегатор)
 # ---------------------------------------------------------------------------
-def _fetch_bicotender(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_bicotender(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://bicotender.ru/search/", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .search-result, .lot-block"):
         a = item.select_one("a.tender-title, a.lot-title, .tender-name a")
@@ -581,12 +577,12 @@ def _fetch_bicotender(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Rostender.info  (агрегатор)
 # ---------------------------------------------------------------------------
-def _fetch_rostender(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_rostender(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://rostender.info/tender/search", {
         "q": kw, "price_from": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".tender-item, .search-result, .result-item"):
         a = item.select_one("a.tender-name, a.result-title, .subject a")
@@ -614,12 +610,12 @@ def _fetch_rostender(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Контур.Закупки  zakupki.kontur.ru  (агрегатор)
 # ---------------------------------------------------------------------------
-def _fetch_kontur(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_kontur(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://zakupki.kontur.ru/search", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".search-result__item, .tender-row, .purchase-item"):
         a = item.select_one("a.search-result__title, a.purchase-name, .tender-subject a")
@@ -647,12 +643,12 @@ def _fetch_kontur(s: requests.Session, kw: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Trade.su
 # ---------------------------------------------------------------------------
-def _fetch_trade(s: requests.Session, kw: str) -> list[dict]:
+def _fetch_trade(s: requests.Session, kw: str) -> list[dict] | None:
     soup = _get(s, "https://trade.su/search", {
         "q": kw, "priceFrom": MIN_PRICE,
     })
     if not soup:
-        return []
+        return None
     out = []
     for item in soup.select(".trade-item, .lot-item, .search-result"):
         a = item.select_one("a.trade-name, a.lot-name, .item-title a")

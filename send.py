@@ -34,7 +34,11 @@ def main() -> None:
         logger.info("No new tenders today — nothing to send")
         return
 
-    send_daily_report(tenders)
+    try:
+        send_daily_report(tenders)
+    except Exception as exc:
+        logger.error("send_daily_report failed: %s", exc)
+        sys.exit(1)
     mark_as_sent([t["id"] for t in tenders])
     logger.info("=== Send complete: %d tenders sent ===", len(tenders))
 
