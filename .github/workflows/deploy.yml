@@ -11,12 +11,17 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         with:
           host: 46.8.254.134
           port: 2244
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GH_PAT
           script: |
             cd /root/semenabot
-            git pull origin claude/seed-parser-bot-qO5Mo
+            git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
+            git fetch origin
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo
             echo "Deploy complete"

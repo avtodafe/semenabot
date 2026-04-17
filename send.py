@@ -13,10 +13,7 @@ _LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send.log")
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.FileHandler(_LOG, encoding="utf-8"),
-        logging.StreamHandler(sys.stdout),
-    ],
+    handlers=[logging.FileHandler(_LOG, encoding="utf-8")],
 )
 
 logger = logging.getLogger(__name__)
