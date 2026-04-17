@@ -17,6 +17,6 @@ jobs:
           script: |
             PYTHON=$(which python3)
             echo "Python path: $PYTHON"
-            (crontab -l | grep -v semenabot; echo "0 8 * * * cd /root/semenabot && $PYTHON parse.py >> /root/semenabot/parse.log 2>&1"; echo "0 10 * * * cd /root/semenabot && $PYTHON send.py >> /root/semenabot/send.log 2>&1") | crontab -
+            (crontab -l | grep -v semenabot; echo "0 8 * * * cd /root/semenabot && $PYTHON parse.py >> /root/semenabot/parse.log 2>&1"; echo "0 9 * * * cd /root/semenabot && $PYTHON send.py >> /root/semenabot/send.log 2>&1") | crontab -
             echo "Cron updated:"
-            crontab -l | grep semenabot
+            crontab -l | grep semenabot || true
