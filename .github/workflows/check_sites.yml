@@ -10,9 +10,38 @@ on:
       - 'check_sites.py'
 
 jobs:
-  check:
+  check-direct:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/seed-parser-bot-qO5Mo
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml PySocks
+
+      - name: Run check_roseltorg
+        run: python3 check_roseltorg.py 2>&1 | tee check_roseltorg_output.txt
+
+      - name: Commit and push results
+        run: |
+          git config user.email "bot@semenabot"
+          git config user.name "SemenaBot"
+          git add check_roseltorg_output.txt
+          git commit -m "auto: check_roseltorg results $(date '+%Y-%m-%d %H:%M UTC')" || true
+          git push origin claude/seed-parser-bot-qO5Mo || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  check-via-vps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
     steps:
       - name: Run check and save results via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -30,9 +59,9 @@ jobs:
             git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
-            python3 check_roseltorg.py 2>&1 | tee check_roseltorg_output.txt
+            python3 check_roseltorg.py 2>&1 | tee check_roseltorg_output_vps.txt
             git config user.email "bot@semenabot"
             git config user.name "SemenaBot"
-            git add check_roseltorg_output.txt
-            git commit -m "auto: check_roseltorg results $(date '+%Y-%m-%d %H:%M')" || true
+            git add check_roseltorg_output_vps.txt
+            git commit -m "auto: check_roseltorg VPS results $(date '+%Y-%m-%d %H:%M')" || true
             git push origin claude/seed-parser-bot-qO5Mo || true
