@@ -1,0 +1,69 @@
+=== IP через прокси ===
+IP: 195.208.89.54
+
+=== /procedures/search_ajax ===
+Status: 200
+Content-Type: 'text/html; charset=UTF-8'
+Length: 134143
+URL: https://www.roseltorg.ru/procedures/search_ajax?sale=1&query_field=%D1%81%D0%B5%D0%BC%D0%B5%D0%BD%D0%B0&status%5B%5D=0&status%5B%5D=1&status%5B%5D=2
+
+--- HTML структура ---
+  Не нашли карточек стандартными селекторами
+  Relevant classes: ['chip__arrow', 'chip__item', 'lot-item__nds', 'lot-item__nmc', 'pagination__items', 'procedure-tags', 'search-results__currency', 'search-results__customer', 'search-results__data', 'search-results__data-col', 'search-results__data-col--left', 'search-results__data-col--right', 'search-results__header', 'search-results__info', 'search-results__info-item--row-gap', 'search-results__inline-title', 'search-results__item', 'search-results__keyword', 'search-results__keyword-arrow', 'search-results__keyword-content', 'search-results__keyword-head', 'search-results__keyword-text', 'search-results__keyword-title', 'search-results__keywords', 'search-results__link', 'search-results__link--description', 'search-results__lot', 'search-results__lot-dot', 'search-results__platform-url', 'search-results__region']
+
+  Raw HTML[:3000]:
+
+
+
+<!--<![endif]-->
+
+
+  <div class="search-results__item autoload-post"
+       data-feature-favorite-lots="lot"
+       data-feature-favorite-lots-lot-number="1"
+       data-feature-favorite-lots-procedure-number="0373200036826000003"
+       data-feature-favorite-lots-favorite-lot-id=""
+       data-feature-favorite-lots-favorite-lot-labels=''
+  >
+        <div class="search-results__info">
+      
+        <div class="search-results__subject">
+                                <a href="/procedure/0373200036826000003"
+               class="search-results__link search-results__link--description">Поставка санитарно-гигиенических изделий для нужд ГБУ "Мой <b class="g-highlighted">семейный</b> центр "Планета <b class="g-highlighted">Семьи"</b></a>
+                  </div>
+        <div class="search-results__header">
+          <div class="search-results__platform-url">
+            <img src="/themes/etp/images/platform/44_fz.svg" alt="изображение площадки"/>
+          </div>
+          <div class="search-results__lot">
+                                      <a href="/procedure/0373200036826000003"
+                 class="search-results__link">0373200036826000003
+                (Лот 1)</a>
+                      </div>
+          <div class="search-results__lot-dot"></div>
+          <div class="search-results__section">
+            <p class="search-results__tooltip" rel="tooltip"
+               title="Торговая секция">Государственные закупки 2.0 (44-ФЗ)</p>
+          </div>
+        </div>
+      
+      <div class="search-results__region">
+                                                                                                <p class="search-results__tooltip" rel="tooltip"
+                     title="Регион заказчика">77. г. Москва</p>
+                                                                              </div>
+
+      <div class="search-results__customer">
+        <div class="search-results__title search-results__title--small">Организатор</div>
+                  <p class="search-results__tooltip" rel="tooltip" title="&#x0413;&#x041E;&#x0421;&#x0423;&#x0414;&#x0410;&#x0420;&#x0421;&#x0422;&#x0412;&#x0415;&#x041D;&#x041D;&#x041E;&#x0415;&#x20;&#x0411;&#x042E;&#x0414;&#x0416;&#x0415;&#x0422;&#x041D;&#x041E;&#x0415;&#x20;&#x0423;&#x0427;&#x0420;&#x0415;&#x0416;&#x0414;&#x0415;&#x041D;&#x0418;&#x0415;&#x20;&#x0413;&#x041E;&#x0420;&#x041E;&#x0414;&#x0410;&#x20;&#x041C;&#x041E;&#x0421;&#x041A;&#x0412;&#x042B;&#x20;&quot;&#x041C;&#x041E;&#x0419;&#x20;&lt;b&#x20;class&#x3D;&quot;g-highlighted&quot;&gt;&#x0421;&#x0415;&#x041C;&#x0415;&#x0419;&#x041D;&#x042B;&#x0419;&lt;&#x2F;b&gt;&#x20;&#x0426;&#x0415;&#x041D;&#x0422;&#x0420;&#x20;&quot;&#x041F;&#x041B;&#x0410;&#x041D;&#x0415;&#x0422;&#x0410;&#x20;&lt;b&#x20;class&#x3D;&quot;g-highlighted&quot;&gt;&#x0421;&#x0415;&#x041C;&#x042C;&#x0418;&quot;&lt;&#x2F;b&gt; <span class='tooltip__inn'>ИНН 7724505552</span>">
+            <a href="/companies/resolve/7724505552/0/772401001" class="link_primary_active link_size_
+
+=== /procedures/search_ajax без sale (все типы) ===
+Status: 200  len=133717
+Ответ отличается от предыдущего
+Items found: 20
+
+=== Одна конкретная процедура ===
+Status: 200  len=220665
+  h1: 'Процедура: B1902251253579'
+  Classes on page (relevant):
+   ['additional-info-procedure', 'additional-info-procedure--visible', 'additional-info-procedure__content', 'auth-window__maintitle', 'auth-window__sectiontitle', 'auth-window__selector-title', 'auth-window__subtitle', 'beta-modal__title', 'data-table__info', 'data-table__info-td', 'data-table__title', 'data-table__title-td', 'etp-banner__title', 'intro-footer__app-info', 'intro-footer__gos-sistem_title', 'intro-footer__info-column', 'intro-footer__up-link-title', 'intro-info__container', 'intro-info__wrapper', 'lot-item', 'lot-item__data', 'lot-item__data-table', 'lot-item__detailed-info', 'lot-item__footer', 'lot-item__header', 'lot-item__info', 'lot-item__info-item--row-gap', 'lot-item__infoblock', 'lot-item__inline-title', 'lot-item__moredetails']
