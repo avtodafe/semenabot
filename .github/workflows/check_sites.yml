@@ -12,18 +12,27 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Deploy latest code via SSH
+      - name: Run check and save results via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         with:
           host: 46.8.254.134
           port: 2244
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 4m
+          command_timeout: 8m
+          envs: GH_PAT
           script: |
             cd /root/semenabot
+            git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
-            python3 check_roseltorg.py
+            python3 check_roseltorg.py 2>&1 | tee check_roseltorg_output.txt
+            git config user.email "bot@semenabot"
+            git config user.name "SemenaBot"
+            git add check_roseltorg_output.txt
+            git commit -m "auto: check_roseltorg results $(date '+%Y-%m-%d %H:%M')" || true
+            git push origin claude/seed-parser-bot-qO5Mo || true
