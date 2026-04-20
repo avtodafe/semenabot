@@ -18,4 +18,4 @@ jobs:
           command_timeout: 4m
           script: |
             cd /root/semenabot
-            python3 check_sites.py
+            python3 check_roseltorg.py
