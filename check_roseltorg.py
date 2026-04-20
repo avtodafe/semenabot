@@ -24,7 +24,7 @@ s.headers.update(HEADERS)
 
 for name, url in urls:
     try:
-        r = s.get(url, timeout=15, allow_redirects=True)
+        r = s.get(url, timeout=(5, 5), allow_redirects=True)
         ct = r.headers.get("Content-Type", "")[:50]
         body = r.text[:200].replace("\n", " ")
         cf = "Cloudflare" if "cloudflare" in r.text.lower() or "cf-ray" in str(r.headers).lower() else ""
