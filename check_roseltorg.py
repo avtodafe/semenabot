@@ -118,3 +118,4 @@ for path in paths:
             print(f"    title: {title!r}")
     except Exception as e:
         print(f"  [ERR] {path}: {str(e)[:60]}")
+
