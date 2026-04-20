@@ -1,0 +1,354 @@
+=== IP через прокси ===
+IP: 195.208.89.54
+
+=== HTML search pages ===
+[200] https://www.roseltorg.ru/procedures/search
+  title='Тендеры и конкурсные торги: актуальные коммерческие и государственные тендеры, аукционы и закупки'  len=388787  cards=4
+  first card: Регистрация на площадке Присоединитесь к более чем 680 000 пользователей. Это бесплатно. Вы хотите зарегистрироваться на площадке как Организатор торгов Получает предложения в качестве или в интересах
+
+[200] https://www.roseltorg.ru/procedures/search?query=семена
+  title='Тендеры и конкурсные торги: актуальные коммерческие и государственные тендеры, аукционы и закупки'  len=390074  cards=4
+  first card: Регистрация на площадке Присоединитесь к более чем 680 000 пользователей. Это бесплатно. Вы хотите зарегистрироваться на площадке как Организатор торгов Получает предложения в качестве или в интересах
+
+[200] https://www.roseltorg.ru/procedures/search?q=семена
+  title='Тендеры и конкурсные торги: актуальные коммерческие и государственные тендеры, аукционы и закупки'  len=390046  cards=4
+  first card: Регистрация на площадке Присоединитесь к более чем 680 000 пользователей. Это бесплатно. Вы хотите зарегистрироваться на площадке как Организатор торгов Получает предложения в качестве или в интересах
+
+[200] https://www.roseltorg.ru/search/com?query=семена
+  title='Закупки по 223-ФЗ – поиск электронных торгов'  len=228026  cards=2
+  first card: Закупки по 223-ФЗ Найти Находите больше с системой тегов Эта функция тестируется в бета-версии Система тегов - это специальные атрибуты, которые характеризуют ту или иную торговую процедуру. Все теги 
+
+[200] https://www.roseltorg.ru/search/com?q=семена
+  title='Закупки по 223-ФЗ – поиск электронных торгов'  len=228022  cards=2
+  first card: Закупки по 223-ФЗ Найти Находите больше с системой тегов Эта функция тестируется в бета-версии Система тегов - это специальные атрибуты, которые характеризуют ту или иную торговую процедуру. Все теги 
+
+[200] https://www.roseltorg.ru/search/44fz?query=семена
+  title='Государственные закупки по 44-ФЗ: актуальные государственные тендеры, госзаказы и госзакупки'  len=227946  cards=2
+  first card: Государственные закупки по 44-ФЗ Найти Находите больше с системой тегов Эта функция тестируется в бета-версии Система тегов - это специальные атрибуты, которые характеризуют ту или иную торговую проце
+
+[200] https://corp.roseltorg.ru/
+  title='Ð\x9aÐ¾Ñ\x80Ð¿Ð¾Ñ\x80Ð°Ñ\x82Ð¸Ð²Ð½Ñ\x8bÐµ Ð·Ð°ÐºÑ\x83Ð¿ÐºÐ¸ Ð¸ Ð·Ð°ÐºÑ\x83Ð¿ÐºÐ¸ Ñ\x81Ñ\x83Ð±Ñ\x8aÐµÐºÑ\x82Ð¾Ð² 223-Ð¤Ð\x97 (Ð²ÐºÐ»Ñ\x8eÑ\x87Ð°Ñ\x8f Ð\x9cÐ¡Ð\x9f) Ð¾Ñ\x82 Ð\xadÐ¢Ð\x9f Â«Ð\xa0Ð¾Ñ\x81Ñ\x8dÐ»Ñ\x82Ð¾Ñ\x80Ð³Â»'  len=39164  cards=0
+
+[200] https://business.roseltorg.ru/
+  title='Ð\xa0Ð¾Ñ\x81Ñ\x8dÐ»Ñ\x82Ð¾Ñ\x80Ð³.Ð\x91Ð¸Ð·Ð½ÐµÑ\x81 - Ð\x9dÐ°Ñ\x85Ð¾Ð´Ð¸Ñ\x82Ðµ Ð½Ð¾Ð²Ñ\x8bÑ\x85 ÐºÐ»Ð¸ÐµÐ½Ñ\x82Ð¾Ð² Ð¸ Ñ\x80Ð°Ñ\x81Ñ\x88Ð¸Ñ\x80Ñ\x8fÐ¹Ñ\x82Ðµ Ñ\x81Ð²Ð¾Ð¹ Ð±Ð¸Ð·Ð½ÐµÑ\x81'  len=3502  cards=0
+
+=== business.roseltorg.ru API ===
+[401] https://business.roseltorg.ru/api/v1/procedures?q=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/procedures?query=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/procedures?text=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/procedures?keyword=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/procedures?search=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/procedures  content-type='?'
+  body[:200]: {}
+
+[404] https://business.roseltorg.ru/api/v1/documents?q=семена  content-type='application/json'
+  JSON keys: ['success', 'errors']
+   {"success": false, "errors": ["No route found for \"GET http://business.roseltorg.ru/api/v1/documents\""]}
+
+[401] https://business.roseltorg.ru/api/v1/lots?q=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/search?q=семена  content-type='?'
+  body[:200]: {}
+
+[401] https://business.roseltorg.ru/api/v1/  content-type='?'
+  body[:200]: {}
+
+=== Form structure: /procedures/search ===
+[200] https://www.roseltorg.ru/procedures/search
+  title='Тендеры и конкурсные торги: актуальные коммерческие и государственные тендеры, аукционы и закупки'  len=388787  cards=4
+  first card: Регистрация на площадке Присоединитесь к более чем 680 000 пользователей. Это бесплатно. Вы хотите зарегистрироваться на площадке как Организатор торгов Получает предложения в качестве или в интересах
+
+--- Формы ---
+  action='/procedures/search_ajax' method='get'
+    input name='sale' type='hidden' value='1'
+    input name='query_field' type='text' value=''
+    input name='status[]' type='checkbox' value='5'
+    input name='status[]' type='checkbox' value='0'
+    input name='status[]' type='checkbox' value='1'
+    input name='status[]' type='checkbox' value='2'
+    input name='status[]' type='checkbox' value='3'
+    input name='status[]' type='checkbox' value='4'
+    input name='start_price' type='text' value=''
+    input name='end_price' type='text' value=''
+    input name='currency' type='radio' value='all'
+    input name='currency' type='radio' value='RUB'
+    input name='currency' type='radio' value='USD'
+    input name='currency' type='radio' value='EUR'
+    input name='currency' type='radio' value='0'
+    input name='address' type='text' value=''
+    input name='place' type='hidden' value=''
+    input name='source[]' type='checkbox' value='1'
+    input name='source[]' type='checkbox' value='28'
+    input name='source[]' type='checkbox' value='13'
+    input name='source[]' type='checkbox' value='2'
+    input name='source[]' type='checkbox' value='20'
+    input name='source[]' type='checkbox' value='24'
+    input name='source[]' type='checkbox' value='25'
+    input name='source[]' type='checkbox' value='3'
+    input name='source[]' type='checkbox' value='6'
+    input name='source[]' type='checkbox' value='8'
+    input name='source[]' type='checkbox' value='14'
+    input name='source[]' type='checkbox' value='12'
+    input name='source[]' type='checkbox' value='18'
+    input name='source[]' type='checkbox' value='29'
+    input name='source[]' type='checkbox' value='21'
+    input name='type[]' type='checkbox' value='1'
+    input name='type[]' type='checkbox' value='2'
+    input name='type[]' type='checkbox' value='3'
+    input name='type[]' type='checkbox' value='4'
+    input name='type[]' type='checkbox' value='5'
+    input name='type[]' type='checkbox' value='21'
+    input name='start_date_requests' type='text' value=''
+    input name='end_date_requests' type='text' value=''
+    input name='kcp_code' type='checkbox' value='1'
+    input name='customer' type='text' value=''
+    input name='region[]' type='checkbox' value='1'
+    input name='region[]' type='checkbox' value='2'
+    input name='region[]' type='checkbox' value='3'
+    input name='region[]' type='checkbox' value='4'
+    input name='region[]' type='checkbox' value='5'
+    input name='region[]' type='checkbox' value='6'
+    input name='region[]' type='checkbox' value='7'
+    input name='region[]' type='checkbox' value='8'
+    input name='region[]' type='checkbox' value='9'
+    input name='region[]' type='checkbox' value='10'
+    input name='region[]' type='checkbox' value='11'
+    input name='region[]' type='checkbox' value='12'
+    input name='region[]' type='checkbox' value='13'
+    input name='region[]' type='checkbox' value='14'
+    input name='region[]' type='checkbox' value='15'
+    input name='region[]' type='checkbox' value='16'
+    input name='region[]' type='checkbox' value='17'
+    input name='region[]' type='checkbox' value='18'
+    input name='region[]' type='checkbox' value='19'
+    input name='region[]' type='checkbox' value='20'
+    input name='region[]' type='checkbox' value='21'
+    input name='region[]' type='checkbox' value='22'
+    input name='region[]' type='checkbox' value='23'
+    input name='region[]' type='checkbox' value='24'
+    input name='region[]' type='checkbox' value='25'
+    input name='region[]' type='checkbox' value='26'
+    input name='region[]' type='checkbox' value='27'
+    input name='region[]' type='checkbox' value='28'
+    input name='region[]' type='checkbox' value='29'
+    input name='region[]' type='checkbox' value='30'
+    input name='region[]' type='checkbox' value='31'
+    input name='region[]' type='checkbox' value='32'
+    input name='region[]' type='checkbox' value='33'
+    input name='region[]' type='checkbox' value='34'
+    input name='region[]' type='checkbox' value='35'
+    input name='region[]' type='checkbox' value='36'
+    input name='region[]' type='checkbox' value='37'
+    input name='region[]' type='checkbox' value='38'
+    input name='region[]' type='checkbox' value='39'
+    input name='region[]' type='checkbox' value='40'
+    input name='region[]' type='checkbox' value='41'
+    input name='region[]' type='checkbox' value='42'
+    input name='region[]' type='checkbox' value='43'
+    input name='region[]' type='checkbox' value='44'
+    input name='region[]' type='checkbox' value='45'
+    input name='region[]' type='checkbox' value='46'
+    input name='region[]' type='checkbox' value='47'
+    input name='region[]' type='checkbox' value='48'
+    input name='region[]' type='checkbox' value='49'
+    input name='region[]' type='checkbox' value='50'
+    input name='region[]' type='checkbox' value='51'
+    input name='region[]' type='checkbox' value='52'
+    input name='region[]' type='checkbox' value='53'
+    input name='region[]' type='checkbox' value='54'
+    input name='region[]' type='checkbox' value='55'
+    input name='region[]' type='checkbox' value='56'
+    input name='region[]' type='checkbox' value='57'
+    input name='region[]' type='checkbox' value='58'
+    input name='region[]' type='checkbox' value='59'
+    input name='region[]' type='checkbox' value='60'
+    input name='region[]' type='checkbox' value='61'
+    input name='region[]' type='checkbox' value='62'
+    input name='region[]' type='checkbox' value='63'
+    input name='region[]' type='checkbox' value='64'
+    input name='region[]' type='checkbox' value='65'
+    input name='region[]' type='checkbox' value='66'
+    input name='region[]' type='checkbox' value='67'
+    input name='region[]' type='checkbox' value='68'
+    input name='region[]' type='checkbox' value='69'
+    input name='region[]' type='checkbox' value='70'
+    input name='region[]' type='checkbox' value='71'
+    input name='region[]' type='checkbox' value='72'
+    input name='region[]' type='checkbox' value='73'
+    input name='region[]' type='checkbox' value='74'
+    input name='region[]' type='checkbox' value='75'
+    input name='region[]' type='checkbox' value='76'
+    input name='region[]' type='checkbox' value='77'
+    input name='region[]' type='checkbox' value='78'
+    input name='region[]' type='checkbox' value='79'
+    input name='region[]' type='checkbox' value='83'
+    input name='region[]' type='checkbox' value='86'
+    input name='region[]' type='checkbox' value='87'
+    input name='region[]' type='checkbox' value='89'
+    input name='region[]' type='checkbox' value='90'
+    input name='region[]' type='checkbox' value='91'
+    input name='region[]' type='checkbox' value='92'
+    input name='region[]' type='checkbox' value='93'
+    input name='region[]' type='checkbox' value='94'
+    input name='region[]' type='checkbox' value='95'
+    input name='region[]' type='checkbox' value='99'
+    input name='okato[]' type='checkbox' value='45000000000'
+    input name='okato[]' type='checkbox' value='40000000000'
+    input name='okato[]' type='checkbox' value='01000000000'
+    input name='okato[]' type='checkbox' value='10000000000'
+    input name='okato[]' type='checkbox' value='11000000000'
+    input name='okato[]' type='checkbox' value='12000000000'
+    input name='okato[]' type='checkbox' value='55000000000'
+    input name='okato[]' type='checkbox' value='14000000000'
+    input name='okato[]' type='checkbox' value='15000000000'
+    input name='okato[]' type='checkbox' value='17000000000'
+    input name='okato[]' type='checkbox' value='18000000000'
+    input name='okato[]' type='checkbox' value='19000000000'
+    input name='okato[]' type='checkbox' value='20000000000'
+    input name='okato[]' type='checkbox' value='21000000000'
+    input name='okato[]' type='checkbox' value='99000000000'
+    input name='okato[]' type='checkbox' value='76000000000'
+    input name='okato[]' type='checkbox' value='23000000000'
+    input name='okato[]' type='checkbox' value='24000000000'
+    input name='okato[]' type='checkbox' value='25000000000'
+    input name='okato[]' type='checkbox' value='83000000000'
+    input name='okato[]' type='checkbox' value='27000000000'
+    input name='okato[]' type='checkbox' value='29000000000'
+    input name='okato[]' type='checkbox' value='30000000000'
+    input name='okato[]' type='checkbox' value='91000000000'
+    input name='okato[]' type='checkbox' value='32000000000'
+    input name='okato[]' type='checkbox' value='33000000000'
+    input name='okato[]' type='checkbox' value='34000000000'
+    input name='okato[]' type='checkbox' value='03000000000'
+    input name='okato[]' type='checkbox' value='04000000000'
+    input name='okato[]' type='checkbox' value='37000000000'
+    input name='okato[]' type='checkbox' value='38000000000'
+    input name='okato[]' type='checkbox' value='41000000000'
+    input name='okato[]' type='checkbox' value='42000000000'
+    input name='okato[]' type='checkbox' value='43000000000'
+    input name='okato[]' type='checkbox' value='44000000000'
+    input name='okato[]' type='checkbox' value='46000000000'
+    input name='okato[]' type='checkbox' value='47000000000'
+    input name='okato[]' type='checkbox' value='11100000000'
+    input name='okato[]' type='checkbox' value='22000000000'
+    input name='okato[]' type='checkbox' value='49000000000'
+    input name='okato[]' type='checkbox' value='50000000000'
+    input name='okato[]' type='checkbox' value='52000000000'
+    input name='okato[]' type='checkbox' value='53000000000'
+    input name='okato[]' type='checkbox' value='54000000000'
+    input name='okato[]' type='checkbox' value='56000000000'
+    input name='okato[]' type='checkbox' value='57000000000'
+    input name='okato[]' type='checkbox' value='05000000000'
+    input name='okato[]' type='checkbox' value='58000000000'
+    input name='okato[]' type='checkbox' value='79000000000'
+    input name='okato[]' type='checkbox' value='84000000000'
+    input name='okato[]' type='checkbox' value='80000000000'
+    input name='okato[]' type='checkbox' value='81000000000'
+    input name='okato[]' type='checkbox' value='82000000000'
+    input name='okato[]' type='checkbox' value='26000000000'
+    input name='okato[]' type='checkbox' value='85000000000'
+    input name='okato[]' type='checkbox' value='86000000000'
+    input name='okato[]' type='checkbox' value='87000000000'
+    input name='okato[]' type='checkbox' value='35000000000'
+    input name='okato[]' type='checkbox' value='88000000000'
+    input name='okato[]' type='checkbox' value='89000000000'
+    input name='okato[]' type='checkbox' value='98000000000'
+    input name='okato[]' type='checkbox' value='90000000000'
+    input name='okato[]' type='checkbox' value='92000000000'
+    input name='okato[]' type='checkbox' value='93000000000'
+    input name='okato[]' type='checkbox' value='95000000000'
+    input name='okato[]' type='checkbox' value='60000000000'
+    input name='okato[]' type='checkbox' value='61000000000'
+    input name='okato[]' type='checkbox' value='36000000000'
+    input name='okato[]' type='checkbox' value='63000000000'
+    input name='okato[]' type='checkbox' value='64000000000'
+    input name='okato[]' type='checkbox' value='65000000000'
+    input name='okato[]' type='checkbox' value='67000000000'
+    input name='okato[]' type='checkbox' value='66000000000'
+    input name='okato[]' type='checkbox' value='07000000000'
+    input name='okato[]' type='checkbox' value='68000000000'
+    input name='okato[]' type='checkbox' value='28000000000'
+    input name='okato[]' type='checkbox' value='69000000000'
+    input name='okato[]' type='checkbox' value='70000000000'
+    input name='okato[]' type='checkbox' value='71000000000'
+    input name='okato[]' type='checkbox' value='94000000000'
+    input name='okato[]' type='checkbox' value='73000000000'
+    input name='okato[]' type='checkbox' value='08000000000'
+    input name='okato[]' type='checkbox' value='71100000000'
+    input name='okato[]' type='checkbox' value='74000000000'
+    input name='okato[]' type='checkbox' value='75000000000'
+    input name='okato[]' type='checkbox' value='96000000000'
+    input name='okato[]' type='checkbox' value='97000000000'
+    input name='okato[]' type='checkbox' value='77000000000'
+    input name='okato[]' type='checkbox' value='71140000000'
+    input name='okato[]' type='checkbox' value='78000000000'
+    input name='start_date_published' type='text' value=''
+    input name='end_date_published' type='text' value=''
+    input name='guarantee_start_price' type='text' value=''
+    input name='guarantee_end_price' type='text' value=''
+    input name='deposit' type='checkbox' value='1'
+    input name='subject' type='checkbox' value='1'
+  action='/procedures/search_ajax' method='get'
+
+--- Все классы (уникальные, первые 50) ---
+  ._active
+  ._button
+  ._hidden
+  ._left
+  ._right
+  .auction-procedures
+  .auth-banner__button
+  .auth-banner__icon
+  .auth-window
+  .auth-window--register-customer
+  .auth-window--register-select
+  .auth-window--register-supplier
+  .auth-window--rosteh-select
+  .auth-window__back-btn
+  .auth-window__banner
+  .auth-window__btn
+  .auth-window__close-btn
+  .auth-window__content
+  .auth-window__descrline
+  .auth-window__descrline--long
+  .auth-window__footer_sticky
+  .auth-window__header
+  .auth-window__header--leftalign
+  .auth-window__item
+  .auth-window__item_description
+  .auth-window__link
+  .auth-window__list
+  .auth-window__list-item
+  .auth-window__list-item_link
+  .auth-window__maintitle
+  .auth-window__row
+  .auth-window__sections
+  .auth-window__sections--middle
+  .auth-window__sectiontitle
+  .auth-window__select-pane
+  .auth-window__select-pane--fullwidth
+  .auth-window__selector-content
+  .auth-window__selector-description
+  .auth-window__selector-icon
+  .auth-window__selector-link
+  .auth-window__selector-text
+  .auth-window__selector-title
+  .auth-window__subtitle
+  .auth-window__summer-banner
+  .auth-window__wrapper
+  .autoload-post
+  .beta-modal
+  .beta-modal__description
+  .beta-modal__icon
+  .beta-modal__notification
