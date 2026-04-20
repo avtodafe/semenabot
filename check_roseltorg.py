@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Диагностика roseltorg.ru — поиск правильных URL и структуры HTML."""
+"""Диагностика roseltorg.ru — поиск правильных URL и API."""
+import json
 import requests
 import warnings
 warnings.filterwarnings("ignore")
@@ -16,40 +17,58 @@ HEADERS = {
 }
 
 
-def make_session():
+def make_session(extra_headers=None):
     s = requests.Session()
     s.headers.update(HEADERS)
+    if extra_headers:
+        s.headers.update(extra_headers)
     s.proxies.update(PROXIES)
     return s
 
 
-def probe(s, url, label=""):
+def probe_html(s, url):
     try:
-        r = s.get(url, timeout=(10, 20), verify=False, allow_redirects=True)
+        r = s.get(url, timeout=(10, 25), verify=False, allow_redirects=True)
         soup = BeautifulSoup(r.text, "lxml")
         title = soup.title.string.strip() if soup.title else "?"
-        # count tender-like items
         cards = (
-            soup.select(".procedure-card") or
-            soup.select(".tender-item") or
-            soup.select(".lot-item") or
             soup.select("[class*='procedure']") or
             soup.select("[class*='tender']") or
             soup.select("[class*='lot']") or
             soup.select("article") or
             soup.select(".card")
         )
-        print(f"[{r.status_code}] {label or url}")
-        print(f"  title: {title!r}")
-        print(f"  len={len(r.text)}  cards={len(cards)}")
-        print(f"  final_url: {r.url}")
-        if r.status_code == 200 and cards:
-            print("  --- first card text ---")
-            print("  " + cards[0].get_text(" ", strip=True)[:200])
+        print(f"[{r.status_code}] {url}")
+        print(f"  title={title!r}  len={len(r.text)}  cards={len(cards)}")
+        if cards:
+            print("  first card:", cards[0].get_text(" ", strip=True)[:200])
         return r, soup
     except Exception as e:
-        print(f"[ERR] {label or url}: {e}")
+        print(f"[ERR] {url}: {e}")
         return None, None
+
+
+def probe_api(s, url):
+    try:
+        r = s.get(url, timeout=(10, 25), verify=False, allow_redirects=True)
+        print(f"[{r.status_code}] {url}  content-type={r.headers.get('content-type','?')!r}")
+        ct = r.headers.get("content-type", "")
+        if "json" in ct:
+            try:
+                d = r.json()
+                print("  JSON keys:", list(d.keys()) if isinstance(d, dict) else f"list len={len(d)}")
+                if isinstance(d, dict):
+                    print("  ", json.dumps(d, ensure_ascii=False)[:300])
+                elif isinstance(d, list) and d:
+                    print("  first:", json.dumps(d[0], ensure_ascii=False)[:300])
+            except Exception as e:
+                print(f"  JSON parse err: {e}")
+        else:
+            print("  body[:200]:", r.text[:200].replace("\n", " "))
+        return r
+    except Exception as e:
+        print(f"[ERR] {url}: {e}")
+        return None
 
 
 # 1. IP check
@@ -61,40 +80,57 @@ try:
 except Exception as e:
     print(f"ERR: {e}")
 
-# 2. Known search URLs with query param variants
-print("\n=== Тестируем поисковые URL ===")
 KW = "семена"
+
+# 2. HTML search pages
+print("\n=== HTML search pages ===")
 s = make_session()
-candidates = [
+for url in [
+    f"https://www.roseltorg.ru/procedures/search",
     f"https://www.roseltorg.ru/procedures/search?query={KW}",
     f"https://www.roseltorg.ru/procedures/search?q={KW}",
-    f"https://www.roseltorg.ru/procedures/search?text={KW}",
-    f"https://www.roseltorg.ru/procedures/search?keyword={KW}",
-    f"https://www.roseltorg.ru/procedures/search",
     f"https://www.roseltorg.ru/search/com?query={KW}",
     f"https://www.roseltorg.ru/search/com?q={KW}",
-    f"https://www.roseltorg.ru/search/com",
     f"https://www.roseltorg.ru/search/44fz?query={KW}",
-    f"https://www.roseltorg.ru/business",
-    f"https://www.roseltorg.ru/torgi",
-]
-for url in candidates:
-    probe(s, url)
+    f"https://corp.roseltorg.ru/",
+    f"https://business.roseltorg.ru/",
+]:
+    probe_html(s, url)
     print()
 
-# 3. Главная страница — ищем форму поиска
-print("\n=== Форма поиска на главной ===")
-r, soup = probe(s, "https://www.roseltorg.ru/")
+# 3. business.roseltorg.ru API
+print("=== business.roseltorg.ru API ===")
+s_api = make_session({"Accept": "application/json"})
+for url in [
+    f"https://business.roseltorg.ru/api/v1/procedures?q={KW}",
+    f"https://business.roseltorg.ru/api/v1/procedures?query={KW}",
+    f"https://business.roseltorg.ru/api/v1/procedures?text={KW}",
+    f"https://business.roseltorg.ru/api/v1/procedures?keyword={KW}",
+    f"https://business.roseltorg.ru/api/v1/procedures?search={KW}",
+    f"https://business.roseltorg.ru/api/v1/procedures",
+    f"https://business.roseltorg.ru/api/v1/documents?q={KW}",
+    f"https://business.roseltorg.ru/api/v1/lots?q={KW}",
+    f"https://business.roseltorg.ru/api/v1/search?q={KW}",
+    f"https://business.roseltorg.ru/api/v1/",
+]:
+    probe_api(s_api, url)
+    print()
+
+# 4. Check main roseltorg.ru/procedures/search form structure
+print("=== Form structure: /procedures/search ===")
+r, soup = probe_html(s, "https://www.roseltorg.ru/procedures/search")
 if soup:
-    print("\n--- Все формы ---")
+    print("\n--- Формы ---")
     for form in soup.find_all("form"):
         print(f"  action={form.get('action')!r} method={form.get('method')!r}")
         for inp in form.find_all(["input", "select", "textarea"]):
-            print(f"    {inp.name} name={inp.get('name')!r} type={inp.get('type')!r} placeholder={inp.get('placeholder','')!r}")
-
-    print("\n--- Ссылки в навигации ---")
-    for a in soup.select("nav a, .nav a, header a, .header a")[:30]:
-        href = a.get("href", "")
-        txt = a.get_text(strip=True)[:60]
-        if href:
-            print(f"  {href!r:55s} {txt!r}")
+            name = inp.get("name", "")
+            if name:
+                print(f"    {inp.name} name={name!r} type={inp.get('type')!r} value={inp.get('value','')!r}")
+    print("\n--- Все классы (уникальные, первые 50) ---")
+    classes = set()
+    for tag in soup.find_all(True):
+        for c in (tag.get("class") or []):
+            classes.add(c)
+    for c in sorted(classes)[:50]:
+        print(f"  .{c}")
