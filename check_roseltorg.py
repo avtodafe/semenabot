@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Диагностика прокси + roseltorg.ru — поиск правильных URL."""
+"""Диагностика roseltorg.ru — поиск правильных URL и структуры HTML."""
 import requests
 import warnings
 warnings.filterwarnings("ignore")
@@ -12,7 +12,7 @@ PROXIES = {"http": PROXY, "https": PROXY}
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
     "Accept-Language": "ru-RU,ru;q=0.9",
-    "Accept": "text/html,application/xhtml+xml,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
 
@@ -23,7 +23,36 @@ def make_session():
     return s
 
 
-# 1. Проверяем IP через прокси
+def probe(s, url, label=""):
+    try:
+        r = s.get(url, timeout=(10, 20), verify=False, allow_redirects=True)
+        soup = BeautifulSoup(r.text, "lxml")
+        title = soup.title.string.strip() if soup.title else "?"
+        # count tender-like items
+        cards = (
+            soup.select(".procedure-card") or
+            soup.select(".tender-item") or
+            soup.select(".lot-item") or
+            soup.select("[class*='procedure']") or
+            soup.select("[class*='tender']") or
+            soup.select("[class*='lot']") or
+            soup.select("article") or
+            soup.select(".card")
+        )
+        print(f"[{r.status_code}] {label or url}")
+        print(f"  title: {title!r}")
+        print(f"  len={len(r.text)}  cards={len(cards)}")
+        print(f"  final_url: {r.url}")
+        if r.status_code == 200 and cards:
+            print("  --- first card text ---")
+            print("  " + cards[0].get_text(" ", strip=True)[:200])
+        return r, soup
+    except Exception as e:
+        print(f"[ERR] {label or url}: {e}")
+        return None, None
+
+
+# 1. IP check
 print("=== IP через прокси ===")
 try:
     s = make_session()
@@ -32,90 +61,40 @@ try:
 except Exception as e:
     print(f"ERR: {e}")
 
-# 2. Главная страница roseltorg.ru
-print("\n=== Главная roseltorg.ru ===")
-try:
-    s = make_session()
-    r = s.get("https://www.roseltorg.ru/", timeout=(10, 20), verify=False)
-    print(f"[{r.status_code}] len={len(r.text)}")
-    soup = BeautifulSoup(r.text, "lxml")
+# 2. Known search URLs with query param variants
+print("\n=== Тестируем поисковые URL ===")
+KW = "семена"
+s = make_session()
+candidates = [
+    f"https://www.roseltorg.ru/procedures/search?query={KW}",
+    f"https://www.roseltorg.ru/procedures/search?q={KW}",
+    f"https://www.roseltorg.ru/procedures/search?text={KW}",
+    f"https://www.roseltorg.ru/procedures/search?keyword={KW}",
+    f"https://www.roseltorg.ru/procedures/search",
+    f"https://www.roseltorg.ru/search/com?query={KW}",
+    f"https://www.roseltorg.ru/search/com?q={KW}",
+    f"https://www.roseltorg.ru/search/com",
+    f"https://www.roseltorg.ru/search/44fz?query={KW}",
+    f"https://www.roseltorg.ru/business",
+    f"https://www.roseltorg.ru/torgi",
+]
+for url in candidates:
+    probe(s, url)
+    print()
 
-    # Ищем все ссылки с ключевыми словами
-    print("\n--- Ссылки с tender/search/auction/proced/lot/zakup ---")
-    seen = set()
-    for a in soup.find_all("a", href=True):
-        h = a["href"]
-        txt = a.get_text(strip=True)[:60]
-        kws = ("tender", "search", "auction", "proced", "lot", "zakup",
-               "purchase", "trade", "торг", "закуп", "аукцион", "процедур")
-        if any(k in h.lower() or k in txt.lower() for k in kws) and h not in seen:
-            seen.add(h)
-            print(f"  {h!r:50s} {txt!r}")
-
-    # Главное меню
-    print("\n--- Nav / header links ---")
-    for sel in ["nav a", ".nav a", ".menu a", "header a", ".header a", ".main-nav a"]:
-        items = soup.select(sel)
-        if items:
-            print(f"[{sel}]")
-            for a in items[:15]:
-                print(f"  {a.get('href')!r:50s} {a.get_text(strip=True)!r}")
-
-    # Формы поиска
-    print("\n--- Формы ---")
+# 3. Главная страница — ищем форму поиска
+print("\n=== Форма поиска на главной ===")
+r, soup = probe(s, "https://www.roseltorg.ru/")
+if soup:
+    print("\n--- Все формы ---")
     for form in soup.find_all("form"):
         print(f"  action={form.get('action')!r} method={form.get('method')!r}")
-        for inp in form.find_all(["input", "select"]):
-            print(f"    name={inp.get('name')!r} type={inp.get('type')!r} value={inp.get('value','')!r}")
+        for inp in form.find_all(["input", "select", "textarea"]):
+            print(f"    {inp.name} name={inp.get('name')!r} type={inp.get('type')!r} placeholder={inp.get('placeholder','')!r}")
 
-except Exception as e:
-    print(f"ERR: {e}")
-    import traceback; traceback.print_exc()
-
-# 3. Пробуем известные пути API / поиска
-print("\n=== Пробуем пути поиска ===")
-paths = [
-    "/procedures",
-    "/procedures/list",
-    "/procedures/search",
-    "/search",
-    "/search/",
-    "/search/?query=семена",
-    "/search/?q=семена",
-    "/search/?text=семена",
-    "/tender/search",
-    "/tenders",
-    "/tenders/search",
-    "/auctions",
-    "/purchases",
-    "/marketplace",
-    "/market",
-    "/trade",
-    "/trades",
-    "/zakupki",
-    "/lots",
-    "/catalog",
-    "/catalog/search",
-    "/node",
-    "/content",
-    "/api/search",
-    "/api/v1/procedures",
-    "/api/v1/lots",
-    "/views/ajax",
-    "/ru/search/node/семена",
-    "/ru/search/node?keys=семена",
-]
-for path in paths:
-    try:
-        s = make_session()
-        url = f"https://www.roseltorg.ru{path}"
-        r = s.get(url, timeout=(5, 10), verify=False, allow_redirects=True)
-        print(f"  [{r.status_code}] {path} (final: {r.url})")
-        if r.status_code == 200 and len(r.text) > 500:
-            # Ищем результаты
-            soup = BeautifulSoup(r.text, "lxml")
-            title = soup.title.string if soup.title else "?"
-            print(f"    title: {title!r}")
-    except Exception as e:
-        print(f"  [ERR] {path}: {str(e)[:60]}")
-
+    print("\n--- Ссылки в навигации ---")
+    for a in soup.select("nav a, .nav a, header a, .header a")[:30]:
+        href = a.get("href", "")
+        txt = a.get_text(strip=True)[:60]
+        if href:
+            print(f"  {href!r:55s} {txt!r}")
