@@ -2,13 +2,19 @@ name: Check sites availability
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - claude/seed-parser-bot-qO5Mo
+    paths:
+      - 'check_roseltorg.py'
+      - 'check_sites.py'
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Run site check via SSH
+      - name: Deploy latest code via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 46.8.254.134
@@ -18,4 +24,6 @@ jobs:
           command_timeout: 4m
           script: |
             cd /root/semenabot
+            git fetch origin claude/seed-parser-bot-qO5Mo
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo
             python3 check_roseltorg.py
