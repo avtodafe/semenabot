@@ -1,33 +1,46 @@
 #!/usr/bin/env python3
-"""Диагностика roseltorg.ru через прокси."""
+"""Диагностика прокси + roseltorg.ru."""
 import requests
 
-PROXY = "http://yq3MUmtH:BqzN3LAa@154.211.9.62:61870"
-PROXIES = {"http": PROXY, "https": PROXY}
+HTTP_PROXY  = "http://yq3MUmtH:BqzN3LAa@154.211.9.62:61870"
+SOCKS_PROXY = "socks5://yq3MUmtH:BqzN3LAa@154.211.9.62:61871"
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+    "Accept-Language": "ru-RU,ru;q=0.9",
 }
 
-urls = [
-    ("Главная",     "https://www.roseltorg.ru/"),
-    ("Поиск",       "https://www.roseltorg.ru/search/?query=семена&minPrice=100000"),
-    ("JSON API?",   "https://www.roseltorg.ru/api/search?query=семена"),
-]
+# 1. Проверяем IP без прокси
+print("=== Без прокси ===")
+try:
+    r = requests.get("http://httpbin.org/ip", timeout=(5, 5))
+    print(f"IP: {r.json()['origin']}")
+except Exception as e:
+    print(f"ERR: {e}")
 
-s = requests.Session()
-s.headers.update(HEADERS)
-s.proxies.update(PROXIES)
+# 2. Проверяем IP через HTTP прокси
+print("\n=== HTTP прокси ===")
+try:
+    r = requests.get("http://httpbin.org/ip", proxies={"http": HTTP_PROXY, "https": HTTP_PROXY}, timeout=(8, 8))
+    print(f"IP: {r.json()['origin']}")
+except Exception as e:
+    print(f"ERR: {e}")
 
-for name, url in urls:
-    try:
-        r = s.get(url, timeout=(8, 10), allow_redirects=True)
-        ct = r.headers.get("Content-Type", "")[:60]
-        cf = "⚠️ Cloudflare" if "cloudflare" in r.text.lower() else ""
-        print(f"\n[{r.status_code}] {name} {cf}")
-        print(f"  Content-Type: {ct}")
-        print(f"  Body: {r.text[:300].replace(chr(10), ' ')}")
-    except Exception as e:
-        print(f"\n[ERR] {name}: {e}")
+# 3. Проверяем IP через SOCKS5 прокси
+print("\n=== SOCKS5 прокси ===")
+try:
+    r = requests.get("http://httpbin.org/ip", proxies={"http": SOCKS_PROXY, "https": SOCKS_PROXY}, timeout=(8, 8))
+    print(f"IP: {r.json()['origin']}")
+except Exception as e:
+    print(f"ERR: {e}")
+
+# 4. Пробуем roseltorg через HTTP прокси с verify=False
+print("\n=== roseltorg через HTTP прокси ===")
+try:
+    s = requests.Session()
+    s.headers.update(HEADERS)
+    s.proxies.update({"http": HTTP_PROXY, "https": HTTP_PROXY})
+    r = s.get("https://www.roseltorg.ru/", timeout=(8, 10), verify=False)
+    print(f"[{r.status_code}] OK — {r.text[:100].replace(chr(10),' ')}")
+except Exception as e:
+    print(f"ERR: {e}")
