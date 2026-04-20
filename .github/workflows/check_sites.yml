@@ -1,0 +1,21 @@
+name: Check sites availability
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run site check via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 46.8.254.134
+          port: 2244
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 4m
+          script: |
+            cd /root/semenabot
+            python3 check_sites.py
