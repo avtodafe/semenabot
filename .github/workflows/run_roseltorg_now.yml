@@ -24,4 +24,11 @@ jobs:
             git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
-            python3 run_roseltorg_now.py
+            python3 run_roseltorg_now.py 2>&1
+            echo "=== parse.log (last 40 lines) ==="
+            tail -40 parse.log
+            git config user.email "bot@semenabot"
+            git config user.name "SemenaBot"
+            git add parse.log || true
+            git commit -m "auto: parse.log after roseltorg run $(date '+%Y-%m-%d %H:%M')" || true
+            git push origin claude/seed-parser-bot-qO5Mo || true

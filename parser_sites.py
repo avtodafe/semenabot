@@ -174,7 +174,6 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
                 params={
                     "query_field": kw,
                     "status[]": ["0", "1", "2"],
-                    "start_price": str(MIN_PRICE),
                 },
                 timeout=(10, 30),
                 verify=False,
