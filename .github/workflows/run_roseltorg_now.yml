@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Deploy latest code and run roseltorg parser
+      - name: Deploy and run roseltorg parser
         uses: appleboy/ssh-action@v1.0.3
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -20,22 +20,30 @@ jobs:
           command_timeout: 8m
           envs: GH_PAT
           script: |
-            set -x
             cd /root/semenabot
             git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
-            echo "=== Python version ==="
-            python3 --version
-            echo "=== .env exists ==="
-            ls -la .env || echo "NO .env FILE"
-            echo "=== Running script ==="
-            python3 run_roseltorg_now.py 2>&1 | tee /tmp/roseltorg_run.txt || echo "SCRIPT EXITED WITH ERROR"
-            echo "=== Last 50 lines of parse.log ==="
-            tail -50 parse.log 2>/dev/null || echo "NO parse.log"
-            cp /tmp/roseltorg_run.txt roseltorg_run_output.txt
-            git config user.email "bot@semenabot"
-            git config user.name "SemenaBot"
-            git add roseltorg_run_output.txt parse.log 2>/dev/null || true
-            git commit -m "auto: roseltorg run output $(date '+%Y-%m-%d %H:%M')" || true
-            git push origin claude/seed-parser-bot-qO5Mo || true
+
+            # Run script and capture output
+            python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1
+            EXIT_CODE=$?
+            echo "Exit code: $EXIT_CODE"
+            cat /tmp/run_out.txt
+
+            # Upload output to GitHub via API (avoids git conflicts)
+            CONTENT=$(base64 -w 0 /tmp/run_out.txt)
+            # Get current file SHA if exists
+            SHA=$(curl -s -H "Authorization: token $GH_PAT" \
+              "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt?ref=claude/seed-parser-bot-qO5Mo" \
+              | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
+            if [ -n "$SHA" ]; then
+              BODY="{\"message\":\"auto: roseltorg run $(date '+%Y-%m-%d %H:%M')\",\"content\":\"$CONTENT\",\"sha\":\"$SHA\",\"branch\":\"claude/seed-parser-bot-qO5Mo\"}"
+            else
+              BODY="{\"message\":\"auto: roseltorg run $(date '+%Y-%m-%d %H:%M')\",\"content\":\"$CONTENT\",\"branch\":\"claude/seed-parser-bot-qO5Mo\"}"
+            fi
+            curl -s -X PUT \
+              -H "Authorization: token $GH_PAT" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt" \
+              -d "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print('Upload:', d.get('commit',{}).get('sha','ERR')[:12])"
