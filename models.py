@@ -64,7 +64,7 @@ def save_tenders(tenders: list[dict]) -> int:
     saved = 0
     with Session(engine) as session:
         for t in tenders:
-            if session.query(Tender).filter_by(reg_num=t["reg_num"]).first():
+            if t.get("reg_num") and session.query(Tender).filter_by(reg_num=t["reg_num"]).first():
                 continue
             fields = {k: v for k, v in t.items() if k != "id" and hasattr(Tender, k)}
             session.add(Tender(**fields))

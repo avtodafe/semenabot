@@ -7,6 +7,7 @@ parser_sites.py — парсеры дополнительных торговых
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
 import time
@@ -95,7 +96,7 @@ def _tender(*, reg_num: str, title: str, customer: str = "", inn: str = "",
     if price > 0 and price < MIN_PRICE:   # известная цена ниже порога
         return None
     return {
-        "reg_num": reg_num or f"{source}-{abs(hash(title + str(price)))}",
+        "reg_num": reg_num or f"{source}-{hashlib.md5((title + str(price)).encode()).hexdigest()[:16]}",
         "title": title.strip(),
         "customer": customer.strip(),
         "inn": inn.strip(),

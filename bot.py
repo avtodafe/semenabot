@@ -61,17 +61,20 @@ def _fmt_tender(idx: int, t: dict) -> str:
     num = _NUMS[idx - 1] if idx <= len(_NUMS) else f"{idx}."
     source = t.get("source") or ""
     source_host = _SOURCE_HOST.get(source, "zakupki.gov.ru")
-    url = html.escape(t.get("url") or source_host)
+    raw_url = t.get("url") or source_host
+    url_tag = f'<a href="{html.escape(raw_url)}">{html.escape(source_host)}</a>'
     deadline = html.escape(t.get("deadline") or "—")
     customer = html.escape(t.get("customer") or "—")
     title = html.escape(t.get("title") or "Без названия")
+    price = t.get("price") or 0
+    price_str = _fmt_price(price) if price else "не указана"
 
     return (
         f"{num} {title}\n"
         f"🏛 Заказчик: {customer}\n"
-        f"💰 Начальная цена: {_fmt_price(t.get('price', 0))}\n"
+        f"💰 Начальная цена: {price_str}\n"
         f"📅 Дедлайн: {deadline}\n"
-        f"🔗 {url}"
+        f"🔗 {url_tag}"
     )
 
 
