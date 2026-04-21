@@ -25,9 +25,9 @@ jobs:
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
 
-            # Run script and capture output
-            python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1
-            EXIT_CODE=$?
+            # Run script and capture output; || captures real exit code without aborting via set -e
+            EXIT_CODE=0
+            python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1 || EXIT_CODE=$?
             echo "Exit code: $EXIT_CODE"
             cat /tmp/run_out.txt
 
