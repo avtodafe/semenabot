@@ -3,9 +3,14 @@
 One-off: удаляем несохранённые тендеры, парсим только roseltorg,
 применяем новые фильтры, отправляем в Telegram.
 """
+import atexit
+import base64
+import json
 import logging
 import os
+import subprocess
 import sys
+from datetime import datetime
 
 _LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "parse.log")
 logging.basicConfig(
@@ -15,8 +20,49 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+def _upload_log() -> None:
+    token = os.environ.get("GH_PAT", "")
+    if not token:
+        return
+    try:
+        logging.shutdown()
+        with open(_LOG, "rb") as f:
+            content = base64.b64encode(f.read()).decode()
+        api = "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt"
+        branch = "claude/seed-parser-bot-qO5Mo"
+        r = subprocess.run(
+            ["curl", "-s", "-H", f"Authorization: token {token}", f"{api}?ref={branch}"],
+            capture_output=True, text=True, timeout=15,
+        )
+        try:
+            sha = json.loads(r.stdout).get("sha", "")
+        except Exception:
+            sha = ""
+        body: dict = {
+            "message": f"auto: roseltorg run {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            "content": content,
+            "branch": branch,
+        }
+        if sha:
+            body["sha"] = sha
+        r2 = subprocess.run(
+            ["curl", "-s", "-X", "PUT",
+             "-H", f"Authorization: token {token}",
+             "-H", "Content-Type: application/json",
+             api, "-d", json.dumps(body)],
+            capture_output=True, text=True, timeout=20,
+        )
+        resp = json.loads(r2.stdout)
+        cs = resp.get("commit", {}).get("sha", "")
+        print("Log upload:", cs[:12] if cs else resp.get("message", "ERR"), flush=True)
+    except Exception as e:
+        print("Log upload failed:", e, flush=True)
+
+
+atexit.register(_upload_log)
+
 import requests
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from models import SeenHash, Tender, engine, init_db, get_unsent_tenders, mark_as_sent, save_tenders
