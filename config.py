@@ -16,7 +16,7 @@ if _raw_db.startswith("sqlite:///") and not _raw_db.startswith("sqlite:////"):
 DATABASE_URL: str = _raw_db
 MIN_PRICE: int = int(os.getenv("MIN_PRICE", "100000"))
 
-# Keywords by group — OR logic within each group
+# Keywords used for SEARCHING on each platform
 KEYWORD_GROUPS: dict[str, list[str]] = {
     "vegetables": [
         "семена овощ",
@@ -28,25 +28,18 @@ KEYWORD_GROUPS: dict[str, list[str]] = {
         "семена морковь",
         "семена лук",
         "семена кабачок",
-        "рассада",
         "посевной материал овощ",
     ],
     "grasses": [
         "семена трав",
-        "кормовые травы",
+        "семена кормовых",
         "семена клевер",
         "семена люцерн",
         "семена тимофеевка",
         "семена овсяниц",
-        "сенокосный травостой",
         "газонные семена",
+        "семена газонных",
         "посевной материал трав",
-    ],
-    "seedlings": [
-        "саженцы",
-        "посадочный материал",
-        "черенки",
-        "рассада многолетн",
     ],
 }
 
@@ -55,6 +48,22 @@ ROSELTORG_PROXY: str = os.getenv(
     "http://yq3MUmtH:BqzN3LAa@195.208.89.54:64310",
 )
 
+# Post-fetch whitelist: title MUST contain at least one of these (case-insensitive)
+# "семен" covers: семена, семенной, семенного, семенам...
+# "семян" covers: семян, семянной... (genitive plural used in "поставка семян X")
+REQUIRE_KEYWORDS: list[str] = [
+    "семен",   # семена, семенной, семенного...
+    "семян",   # семян (genitive plural: "поставка семян клевера")
+    "посевн",  # посевной материал, посевная
+]
+
+# Post-fetch blacklist: title must NOT contain any of these
 EXCLUDE_KEYWORDS: list[str] = [
-    "семена подсолнечник",
+    "рассад",        # рассада, рассады, рассадный
+    "саженц",        # саженцы, саженцев
+    "черенк",        # черенки
+    "подсолнечник",
+    "семейн",        # семейный, семейного, семейного центра
+    "семьи",
+    "семья",
 ]

@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 def main() -> int:
     from dedup import deduplicate
+    from filters import filter_tenders
     from models import init_db, save_tenders
     from parser_gos import fetch_all_tenders as fetch_gos
     from parser_sber import fetch_all_tenders as fetch_sber
@@ -38,7 +39,9 @@ def main() -> int:
         len(all_tenders), len(gos), len(sber), len(sites),
     )
 
-    unique = deduplicate(all_tenders)
+    relevant = filter_tenders(all_tenders)
+    logger.info("After relevance filter: %d tenders", len(relevant))
+    unique = deduplicate(relevant)
     saved = save_tenders(unique)
     logger.info("=== Parse complete: %d new tenders saved ===", saved)
     return saved

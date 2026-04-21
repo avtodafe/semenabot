@@ -28,10 +28,10 @@ SEARCH_TERMS = [
     "семена кормовых трав",
     "семена клевер",
     "семена люцерн",
-    "рассада",
-    "саженцы",
-    "посадочный материал",
+    "семена тимофеевка",
     "газонные семена",
+    "семена газонных",
+    "посевной материал",
 ]
 
 HEADERS = {
@@ -205,8 +205,12 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
         customer_a = item.select_one(".search-results__customer a")
         customer = customer_a.get_text(strip=True) if customer_a else ""
 
-        left = item.select_one(".search-results__data-col--left")
-        price = _parse_price(left.get_text(" ", strip=True)) if left else 0.0
+        price_el = (
+            item.select_one(".search-results__currency") or
+            item.select_one(".lot-item__nmc") or
+            item.select_one(".search-results__data-col--left")
+        )
+        price = _parse_price(price_el.get_text(" ", strip=True)) if price_el else 0.0
 
         right = item.select_one(".search-results__data-col--right")
         deadline = right.get_text(" ", strip=True) if right else ""
