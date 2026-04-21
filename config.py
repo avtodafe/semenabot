@@ -50,6 +50,11 @@ KEYWORD_GROUPS: dict[str, list[str]] = {
     ],
 }
 
+ROSELTORG_PROXY: str = os.getenv(
+    "ROSELTORG_PROXY",
+    "http://yq3MUmtH:BqzN3LAa@195.208.89.54:64310",
+)
+
 EXCLUDE_KEYWORDS: list[str] = [
     "семена подсолнечник",
 ]

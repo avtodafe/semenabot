@@ -15,7 +15,9 @@ from datetime import date, timedelta
 import requests
 from bs4 import BeautifulSoup
 
-from config import EXCLUDE_KEYWORDS, MIN_PRICE
+import warnings
+
+from config import EXCLUDE_KEYWORDS, MIN_PRICE, ROSELTORG_PROXY
 
 logger = logging.getLogger(__name__)
 
@@ -148,30 +150,74 @@ def _fetch_rts(s: requests.Session, kw: str) -> list[dict] | None:
 # ---------------------------------------------------------------------------
 # Росэлторг  roseltorg.ru
 # ---------------------------------------------------------------------------
-def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
-    soup = _get(s, "https://www.roseltorg.ru/search/", {
-        "query": kw, "minPrice": MIN_PRICE, "type": "tender",
+def _make_roseltorg_session() -> requests.Session:
+    """Session with Russian proxy — roseltorg.ru is TLS-blocked outside Russia."""
+    s = requests.Session()
+    s.headers.update({
+        **HEADERS,
+        "Referer": "https://www.roseltorg.ru/procedures/search",
+        "X-Requested-With": "XMLHttpRequest",
     })
-    if not soup:
+    if ROSELTORG_PROXY:
+        s.proxies.update({"http": ROSELTORG_PROXY, "https": ROSELTORG_PROXY})
+    return s
+
+
+def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
+    rs = _make_roseltorg_session()
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            r = rs.get(
+                "https://www.roseltorg.ru/procedures/search_ajax",
+                params={
+                    "query_field": kw,
+                    "status[]": ["0", "1", "2"],
+                    "start_price": str(MIN_PRICE),
+                },
+                timeout=(10, 30),
+                verify=False,
+            )
+            r.raise_for_status()
+    except Exception as e:
+        logger.warning("roseltorg GET — %s", e)
         return None
+
+    soup = BeautifulSoup(r.text, "lxml")
     out = []
-    for item in soup.select(".search__item, .tender-item, .lot-item"):
-        a = item.select_one("a.search__title, a.tender-title, h3 a")
-        if not a:
+    for item in soup.select(".search-results__item"):
+        section_el = item.select_one(".search-results__section p")
+        section = (section_el.get("title") or section_el.get_text(strip=True)) if section_el else ""
+        # Skip FZ-44/FZ-223 — already covered by zakupki.gov.ru parser
+        if "44-ФЗ" in section or "223-ФЗ" in section:
             continue
-        href = a.get("href", "")
+
+        title_a = item.select_one(".search-results__link--description")
+        if not title_a:
+            continue
+        href = title_a.get("href", "")
         if href and not href.startswith("http"):
             href = "https://www.roseltorg.ru" + href
-        price_el = item.select_one(".search__price, .price, .lot-price")
-        customer_el = item.select_one(".search__org, .customer, .org-name")
-        deadline_el = item.select_one(".search__date, .deadline, .date-end")
+
+        proc_num = item.get("data-feature-favorite-lots-procedure-number", "") or _id_from_url(href, "RELT")
+
+        customer_a = item.select_one(".search-results__customer a")
+        customer = customer_a.get_text(strip=True) if customer_a else ""
+
+        left = item.select_one(".search-results__data-col--left")
+        price = _parse_price(left.get_text(" ", strip=True)) if left else 0.0
+
+        right = item.select_one(".search-results__data-col--right")
+        deadline = right.get_text(" ", strip=True) if right else ""
+
         t = _tender(
-            reg_num=_id_from_url(href, "RELT"),
-            title=a.get_text(strip=True),
-            customer=customer_el.get_text(strip=True) if customer_el else "",
-            price=_parse_price(price_el.get_text(strip=True)) if price_el else 0.0,
-            deadline=deadline_el.get_text(strip=True) if deadline_el else "",
-            url=href, source="roseltorg",
+            reg_num=f"RELT-{proc_num}" if proc_num else "",
+            title=title_a.get_text(strip=True),
+            customer=customer,
+            price=price,
+            deadline=deadline,
+            url=href,
+            source="roseltorg",
         )
         if t:
             out.append(t)
