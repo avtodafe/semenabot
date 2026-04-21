@@ -24,7 +24,7 @@ jobs:
             cd /root/semenabot
 
             # Clear stale git locks left by concurrent workflows
-            rm -f .git/index.lock .git/HEAD.lock .git/refs/heads/claude/seed-parser-bot-qO5Mo.lock
+            rm -f .git/index.lock .git/HEAD.lock
 
             git remote set-url origin "https://$GH_PAT@github.com/avtodafe/semenabot.git"
             git fetch origin claude/seed-parser-bot-qO5Mo 2>&1 | head -5
@@ -36,18 +36,39 @@ jobs:
             echo "Exit code: $EXIT_CODE"
             cat /tmp/run_out.txt
 
-            # Upload output to GitHub via API (avoids git conflicts)
-            CONTENT=$(base64 -w 0 /tmp/run_out.txt)
-            SHA=$(curl -s -H "Authorization: token $GH_PAT" \
-              "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt?ref=claude/seed-parser-bot-qO5Mo" \
-              | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
-            if [ -n "$SHA" ]; then
-              BODY="{\"message\":\"auto: roseltorg run $(date '+%Y-%m-%d %H:%M')\",\"content\":\"$CONTENT\",\"sha\":\"$SHA\",\"branch\":\"claude/seed-parser-bot-qO5Mo\"}"
-            else
-              BODY="{\"message\":\"auto: roseltorg run $(date '+%Y-%m-%d %H:%M')\",\"content\":\"$CONTENT\",\"branch\":\"claude/seed-parser-bot-qO5Mo\"}"
-            fi
-            curl -s -X PUT \
-              -H "Authorization: token $GH_PAT" \
-              -H "Content-Type: application/json" \
-              "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt" \
-              -d "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print('Upload:', d.get('commit',{}).get('sha','ERR')[:12])" || echo "Upload failed"
+            # Upload output to GitHub via API using Python (proper JSON, no shell quoting issues)
+            GH_PAT="$GH_PAT" python3 - <<'PYEOF'
+import base64, json, os, subprocess
+from datetime import datetime
+
+with open('/tmp/run_out.txt', 'rb') as f:
+    content = base64.b64encode(f.read()).decode()
+
+token = os.environ['GH_PAT']
+api = 'https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt'
+branch = 'claude/seed-parser-bot-qO5Mo'
+
+r = subprocess.run(['curl', '-sf', '-H', f'Authorization: token {token}',
+    f'{api}?ref={branch}'], capture_output=True, text=True)
+try:
+    sha = json.loads(r.stdout).get('sha', '')
+except Exception:
+    sha = ''
+
+body = {'message': f'auto: roseltorg run {datetime.now().strftime("%Y-%m-%d %H:%M")}',
+        'content': content, 'branch': branch}
+if sha:
+    body['sha'] = sha
+
+r = subprocess.run(['curl', '-s', '-X', 'PUT',
+    '-H', f'Authorization: token {token}',
+    '-H', 'Content-Type: application/json',
+    api, '-d', json.dumps(body)], capture_output=True, text=True)
+try:
+    d = json.loads(r.stdout)
+    print('Upload:', d.get('commit', {}).get('sha', 'ERR-no-commit')[:12])
+    if 'message' in d and 'commit' not in d:
+        print('API error:', d['message'])
+except Exception as e:
+    print('Parse error:', e, '| Response:', r.stdout[:300])
+PYEOF
