@@ -20,20 +20,24 @@ jobs:
           command_timeout: 8m
           envs: GH_PAT
           script: |
+            set +e
             cd /root/semenabot
-            git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
-            git fetch origin claude/seed-parser-bot-qO5Mo
-            git reset --hard origin/claude/seed-parser-bot-qO5Mo
 
-            # Run script and capture output; || captures real exit code without aborting via set -e
-            EXIT_CODE=0
-            python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1 || EXIT_CODE=$?
+            # Clear stale git locks left by concurrent workflows
+            rm -f .git/index.lock .git/HEAD.lock .git/refs/heads/claude/seed-parser-bot-qO5Mo.lock
+
+            git remote set-url origin "https://$GH_PAT@github.com/avtodafe/semenabot.git"
+            git fetch origin claude/seed-parser-bot-qO5Mo 2>&1 | head -5
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo 2>&1 | head -5
+
+            # Run script and capture output
+            python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1
+            EXIT_CODE=$?
             echo "Exit code: $EXIT_CODE"
             cat /tmp/run_out.txt
 
             # Upload output to GitHub via API (avoids git conflicts)
             CONTENT=$(base64 -w 0 /tmp/run_out.txt)
-            # Get current file SHA if exists
             SHA=$(curl -s -H "Authorization: token $GH_PAT" \
               "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt?ref=claude/seed-parser-bot-qO5Mo" \
               | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
@@ -46,4 +50,4 @@ jobs:
               -H "Authorization: token $GH_PAT" \
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/avtodafe/semenabot/contents/roseltorg_run_output.txt" \
-              -d "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print('Upload:', d.get('commit',{}).get('sha','ERR')[:12])"
+              -d "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print('Upload:', d.get('commit',{}).get('sha','ERR')[:12])" || echo "Upload failed"
