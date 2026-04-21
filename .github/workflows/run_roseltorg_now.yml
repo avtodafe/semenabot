@@ -20,15 +20,22 @@ jobs:
           command_timeout: 8m
           envs: GH_PAT
           script: |
+            set -x
             cd /root/semenabot
             git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
             git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
-            python3 run_roseltorg_now.py 2>&1
-            echo "=== parse.log (last 40 lines) ==="
-            tail -40 parse.log
+            echo "=== Python version ==="
+            python3 --version
+            echo "=== .env exists ==="
+            ls -la .env || echo "NO .env FILE"
+            echo "=== Running script ==="
+            python3 run_roseltorg_now.py 2>&1 | tee /tmp/roseltorg_run.txt || echo "SCRIPT EXITED WITH ERROR"
+            echo "=== Last 50 lines of parse.log ==="
+            tail -50 parse.log 2>/dev/null || echo "NO parse.log"
+            cp /tmp/roseltorg_run.txt roseltorg_run_output.txt
             git config user.email "bot@semenabot"
             git config user.name "SemenaBot"
-            git add parse.log || true
-            git commit -m "auto: parse.log after roseltorg run $(date '+%Y-%m-%d %H:%M')" || true
+            git add roseltorg_run_output.txt parse.log 2>/dev/null || true
+            git commit -m "auto: roseltorg run output $(date '+%Y-%m-%d %H:%M')" || true
             git push origin claude/seed-parser-bot-qO5Mo || true
