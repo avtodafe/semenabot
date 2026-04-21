@@ -1,0 +1,27 @@
+name: Run roseltorg now
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Deploy latest code and run roseltorg parser
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        with:
+          host: 46.8.254.134
+          port: 2244
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 8m
+          envs: GH_PAT
+          script: |
+            cd /root/semenabot
+            git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
+            git fetch origin claude/seed-parser-bot-qO5Mo
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo
+            python3 run_roseltorg_now.py
