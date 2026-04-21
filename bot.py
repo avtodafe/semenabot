@@ -163,3 +163,11 @@ def send_daily_report(tenders: list[dict]) -> None:
     logger.info("Sending %d tenders to %s", len(tenders), CHANNEL_ID)
     asyncio.run(_run(tenders))
     logger.info("Telegram send complete")
+
+
+def send_text(text: str) -> None:
+    """Send a plain text message to the channel (for diagnostics)."""
+    async def _go() -> None:
+        async with Bot(token=BOT_TOKEN) as bot:
+            await bot.send_message(chat_id=CHANNEL_ID, text=text)
+    asyncio.run(_go())
