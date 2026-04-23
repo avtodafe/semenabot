@@ -19,6 +19,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _tg(text: str) -> None:
+    try:
+        import requests as _req
+        from config import BOT_TOKEN, CHANNEL_ID
+        _req.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": CHANNEL_ID, "text": text},
+            timeout=10,
+        )
+    except Exception as e:
+        logger.warning("_tg failed: %s", e)
+
+
 def main() -> int:
     from dedup import deduplicate
     from filters import filter_tenders
@@ -44,6 +57,12 @@ def main() -> int:
     unique = deduplicate(relevant)
     saved = save_tenders(unique)
     logger.info("=== Parse complete: %d new tenders saved ===", saved)
+
+    _tg(
+        f"📊 Parse диагностика:\n"
+        f"GOS: {len(gos)} | SBER: {len(sber)} | SITES: {len(sites)}\n"
+        f"Всего: {len(all_tenders)} → фильтр: {len(relevant)} → новых: {saved}"
+    )
     return saved
 
 

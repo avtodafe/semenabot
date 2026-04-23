@@ -8,25 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Parse tenders
+      - name: Deploy, parse and send
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         with:
           host: 46.8.254.134
           port: 2244
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 20m
+          command_timeout: 25m
+          envs: GH_PAT
           script: |
+            set +e
             cd /root/semenabot
+            rm -f .git/index.lock .git/HEAD.lock
+            git remote set-url origin "https://$GH_PAT@github.com/avtodafe/semenabot.git"
+            git fetch origin claude/seed-parser-bot-qO5Mo
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo
             python3 parse.py
-      - name: Send to Telegram
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: 46.8.254.134
-          port: 2244
-          username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 5m
-          script: |
-            cd /root/semenabot
             python3 send.py
+            exit 0
