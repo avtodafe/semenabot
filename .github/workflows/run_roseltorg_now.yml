@@ -24,8 +24,8 @@ jobs:
             cd /root/semenabot
             rm -f .git/index.lock .git/HEAD.lock
             git remote set-url origin "https://$GH_PAT@github.com/avtodafe/semenabot.git"
-            git fetch origin claude/seed-parser-bot-qO5Mo 2>&1 | head -5
-            git reset --hard origin/claude/seed-parser-bot-qO5Mo 2>&1 | head -5
+            git fetch origin claude/seed-parser-bot-qO5Mo
+            git reset --hard origin/claude/seed-parser-bot-qO5Mo
             python3 run_roseltorg_now.py > /tmp/run_out.txt 2>&1
             EXIT_CODE=$?
             echo "Exit code: $EXIT_CODE"
