@@ -19,6 +19,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _tg(text: str) -> None:
+    try:
+        import requests as _req
+        from config import BOT_TOKEN, CHANNEL_ID
+        _req.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": CHANNEL_ID, "text": text},
+            timeout=10,
+        )
+    except Exception as e:
+        logger.warning("_tg failed: %s", e)
+
+
 def main() -> None:
     from bot import send_daily_report
     from models import get_unsent_tenders, init_db, mark_as_sent
@@ -29,6 +42,7 @@ def main() -> None:
     tenders = get_unsent_tenders()
     if not tenders:
         logger.info("No new tenders today — nothing to send")
+        _tg("✅ Бот отработал — новых подходящих тендеров сегодня нет.")
         return
 
     try:
