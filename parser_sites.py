@@ -206,8 +206,7 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
 
         price_el = (
             item.select_one(".search-results__currency") or
-            item.select_one(".lot-item__nmc") or
-            item.select_one(".search-results__data-col--left")
+            item.select_one(".lot-item__nmc")
         )
         price = _parse_price(price_el.get_text(" ", strip=True)) if price_el else 0.0
 

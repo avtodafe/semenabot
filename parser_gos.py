@@ -6,6 +6,7 @@ parser_gos.py — парсер zakupki.gov.ru
 """
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
 import time
@@ -120,7 +121,7 @@ def _parse_entries(soup: BeautifulSoup) -> list[dict]:
             # Price
             price_el = block.select_one(".price-block__value")
             price = _parse_price(price_el.get_text(strip=True)) if price_el else 0.0
-            if price < MIN_PRICE:
+            if price > 0 and price < MIN_PRICE:
                 continue
 
             # Dates — find block labelled "Окончание подачи заявок"
@@ -145,7 +146,7 @@ def _parse_entries(soup: BeautifulSoup) -> list[dict]:
 
             entries.append(
                 {
-                    "reg_num": reg_num or f"GOS-{hash(title + str(price))}",
+                    "reg_num": reg_num or f"GOS-{hashlib.md5((title + str(price)).encode()).hexdigest()[:16]}",
                     "title": title,
                     "customer": customer,
                     "inn": inn,
