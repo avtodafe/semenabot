@@ -2,12 +2,6 @@ name: Check sites availability
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - claude/seed-parser-bot-qO5Mo
-    paths:
-      - 'check_roseltorg.py'
-      - 'check_sites.py'
 
 jobs:
   check-direct:

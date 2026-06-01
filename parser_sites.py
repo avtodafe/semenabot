@@ -726,24 +726,12 @@ def _fetch_trade(s: requests.Session, kw: str) -> list[dict] | None:
 # Реестр площадок
 # ---------------------------------------------------------------------------
 
+# Only Roseltorg is enabled — it has a working custom fetcher.
+# The other 16 sites used guessed CSS selectors that never matched,
+# downloading full HTML pages (200-500 KB each) for every keyword
+# and returning zero results — causing ~750 MB/month of wasted traffic.
 SITE_FETCHERS: list[tuple[str, callable]] = [
-    ("РТС-тендер",       _fetch_rts),
     ("Росэлторг",        _fetch_roseltorg),
-    ("B2B-Center",       _fetch_b2b),
-    ("OTC.ru",           _fetch_otc),
-    ("Фабрикант",        _fetch_fabrikant),
-    ("ТЭК-Торг",         _fetch_tektorg),
-    ("ЭТП ГПБ",          _fetch_etpgpb),
-    ("ЭТП ЕТС",          _fetch_etpets),
-    ("ЭТП ММВБ",         _fetch_etpmicex),
-    ("АГЗРТ",            _fetch_agzrt),
-    ("Lot-online",       _fetch_lotonline),
-    ("ЭТП ГОЗ",          _fetch_etpgoz),
-    ("Закупки360",       _fetch_zakupki360),
-    ("Bicotender",       _fetch_bicotender),
-    ("Rostender",        _fetch_rostender),
-    ("Контур.Закупки",   _fetch_kontur),
-    ("Trade.su",         _fetch_trade),
 ]
 
 

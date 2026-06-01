@@ -22,6 +22,6 @@ jobs:
           script: |
             cd /root/semenabot
             git remote set-url origin https://$GH_PAT@github.com/avtodafe/semenabot.git
-            git fetch origin
+            git fetch origin claude/seed-parser-bot-qO5Mo
             git reset --hard origin/claude/seed-parser-bot-qO5Mo
             echo "Deploy complete"
