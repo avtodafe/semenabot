@@ -91,9 +91,22 @@ def _parse_entries(soup: BeautifulSoup) -> list[dict]:
 
     for block in blocks:
         try:
-            # Title / subject
-            title_el = block.select_one(".registry-entry__body-value")
-            title = title_el.get_text(separator=" ", strip=True) if title_el else ""
+            # Title / subject — find the row labelled "Объект закупки";
+            # otherwise the OKPD2 categories block (semicolon-separated list)
+            # is often returned first by select_one(".registry-entry__body-value").
+            title = ""
+            for body_block in block.select(".registry-entry__body-block"):
+                label_el = body_block.select_one(".registry-entry__body-title")
+                if label_el:
+                    label = label_el.get_text(strip=True).lower()
+                    if "объект" in label or "наименован" in label:
+                        val_el = body_block.select_one(".registry-entry__body-value")
+                        if val_el:
+                            title = val_el.get_text(separator=" ", strip=True)
+                            break
+            if not title:
+                title_el = block.select_one(".registry-entry__body-value")
+                title = title_el.get_text(separator=" ", strip=True) if title_el else ""
             if not title or _is_excluded(title):
                 continue
 

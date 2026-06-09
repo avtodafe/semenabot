@@ -198,6 +198,8 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
         href = title_a.get("href", "")
         if href and not href.startswith("http"):
             href = "https://www.roseltorg.ru" + href
+        # Use separator=" " so text from child tags doesn't get concatenated without spaces
+        title_text = re.sub(r"\s+", " ", title_a.get_text(separator=" ", strip=True)).strip()
 
         proc_num = item.get("data-feature-favorite-lots-procedure-number", "") or _id_from_url(href, "RELT")
 
@@ -215,7 +217,7 @@ def _fetch_roseltorg(s: requests.Session, kw: str) -> list[dict] | None:
 
         t = _tender(
             reg_num=f"RELT-{proc_num}" if proc_num else "",
-            title=title_a.get_text(strip=True),
+            title=title_text,
             customer=customer,
             price=price,
             deadline=deadline,

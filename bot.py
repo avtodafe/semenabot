@@ -65,7 +65,8 @@ def _fmt_tender(idx: int, t: dict) -> str:
     url_tag = f'<a href="{html.escape(raw_url)}">{html.escape(source_host)}</a>'
     deadline = html.escape(t.get("deadline") or "—")
     customer = html.escape(t.get("customer") or "—")
-    title = html.escape(t.get("title") or "Без названия")
+    raw_title = (t.get("title") or "Без названия")[:200]
+    title = html.escape(raw_title)
     price = t.get("price") or 0
     price_str = _fmt_price(price) if price else "не указана"
 
